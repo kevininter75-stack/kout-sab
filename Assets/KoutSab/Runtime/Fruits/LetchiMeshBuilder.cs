@@ -18,7 +18,8 @@ namespace KoutSab.Fruits
         [Tooltip("Rayon en mètres. Un vrai letchi fait 3,5 cm de DIAMÈTRE.")]
         public float radius;
 
-        [Tooltip("Allongement vertical. Le letchi n'est pas une bille, il est ovoïde.")]
+        [Tooltip("Allongement vertical. Un letchi est presque rond, à peine plus " +
+                 "haut que large — pas l'ovoïde franc que j'avais fait au départ.")]
         public float elongation;
 
         [Tooltip("Force des ondulations de la silhouette, en fraction du rayon.")]
@@ -45,12 +46,12 @@ namespace KoutSab.Fruits
         {
             subdivisions = 3,
             radius = 0.018f,
-            elongation = 1.14f,
+            elongation = 1.06f,
             bumpAmplitude = 0.045f,
             bumpFrequency = 3.4f,
-            tubercleScale = 330f,
-            tubercleRelief = 0.135f,
-            tubercleSharpness = 3.6f,
+            tubercleScale = 340f,
+            tubercleRelief = 0.165f,
+            tubercleSharpness = 1.3f,
             seed = 1
         };
     }

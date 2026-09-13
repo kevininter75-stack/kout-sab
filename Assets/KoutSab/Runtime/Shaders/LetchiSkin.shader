@@ -7,9 +7,9 @@ Shader "Kout Sab/Peau de letchi"
 {
     Properties
     {
-        _BaseColor       ("Rouge des tubercules",   Color) = (0.66, 0.25, 0.15, 1)
-        _DeepColor       ("Rouge des sillons",      Color) = (0.36, 0.12, 0.07, 1)
-        _TipColor        ("Pointe des tubercules",  Color) = (0.90, 0.52, 0.38, 1)
+        _BaseColor       ("Rose des écailles",       Color) = (0.88, 0.35, 0.39, 1)
+        _DeepColor       ("Rose des sillons",        Color) = (0.69, 0.23, 0.28, 1)
+        _TipColor        ("Pointe des écailles",     Color) = (0.95, 0.66, 0.64, 1)
         _TubercleScale   ("Densité des tubercules", Range(50, 1500)) = 520
         _TubercleDepth   ("Relief fin (par-dessus la géométrie)", Range(0, 3)) = 1.6
         _GrooveSharpness ("Netteté des sillons",    Range(1, 12)) = 4
@@ -111,7 +111,7 @@ Shader "Kout Sab/Peau de letchi"
                 // révèle. Peindre les pointes en clair donnait des points lumineux,
                 // comme si le fruit était criblé de perles. On garde donc des sillons
                 // franchement sombres et une pointe à peine éclaircie.
-                half3 albedo = lerp(_DeepColor.rgb, _BaseColor.rgb, smoothstep(0.02, 0.42, height));
+                half3 albedo = lerp(_DeepColor.rgb, _BaseColor.rgb, smoothstep(0.0, 0.58, height));
                 albedo = lerp(albedo, _TipColor.rgb, saturate((height - 0.86) * 2.4) * 0.16);
 
                 InputData inputData = (InputData)0;

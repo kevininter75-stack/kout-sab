@@ -87,18 +87,19 @@ namespace KoutSab.EditorTools
             LetchiShape shape = LetchiShape.Default;
             material.SetFloat("_TubercleScale", shape.tubercleScale);
             material.SetFloat("_GrooveSharpness", shape.tubercleSharpness);
-            material.SetFloat("_TubercleDepth", 1.6f);
-            material.SetFloat("_Smoothness", 0.34f);
+            material.SetFloat("_TubercleDepth", 1.1f);
+            material.SetFloat("_Smoothness", 0.26f);
 
-            // Couleurs relevées sur 196 905 pixels de peau, tirés de six photos
-            // de Litchi chinensis. La teinte réelle est à 10-16°, un rouge brique
-            // orangé — pas le rouge rosé à 354° qu'on imagine de mémoire.
-            // Valeurs remontées par rapport à la mesure brute : le moteur applique
-            // son propre éclairage par-dessus, reprendre les pixels ombrés d'une
-            // photo assombrirait deux fois.
-            material.SetColor("_DeepColor", new Color(0.36f, 0.12f, 0.07f));
-            material.SetColor("_BaseColor", new Color(0.62f, 0.25f, 0.16f));
-            material.SetColor("_TipColor", new Color(0.90f, 0.52f, 0.38f));
+            // Couleurs d'un letchi FRAIS, rose-rouge à ~356° de teinte.
+            //
+            // J'avais d'abord mesuré 196 905 pixels sur six photos Wikimedia et
+            // obtenu du brique orangé à 12°. La mesure était juste, l'échantillon
+            // ne l'était pas : ces letchis étaient mûrs à point, voire passés. Un
+            // letchi frais — celui qu'on veut montrer dans un jeu — est franchement
+            // rose. Mesurer rigoureusement le mauvais échantillon reste une erreur.
+            material.SetColor("_DeepColor", new Color(0.69f, 0.23f, 0.28f));
+            material.SetColor("_BaseColor", new Color(0.85f, 0.30f, 0.36f));
+            material.SetColor("_TipColor", new Color(0.95f, 0.66f, 0.64f));
             EditorUtility.SetDirty(material);
 
             return material;
@@ -114,7 +115,9 @@ namespace KoutSab.EditorTools
             // Plus haut, le relief des tubercules s'aplatit ; c'est l'ombre longue
             // qui révèle la texture de la peau.
             sunObject.transform.rotation = Quaternion.Euler(14f, 35f, 0f);
-            sun.color = new Color(1.0f, 0.76f, 0.52f);
+            // Soleil moins orangé qu'au premier jet : à 0,52 de bleu, il virait tout
+            // le fruit au tomate et mangeait le rose du letchi.
+            sun.color = new Color(1.0f, 0.88f, 0.76f);
             sun.intensity = 3.5f;
             sun.shadows = LightShadows.Soft;
 

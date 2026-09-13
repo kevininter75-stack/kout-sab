@@ -39,9 +39,16 @@ namespace KoutSab.Fruits
         }
 
         /// <summary>
-        /// Hauteur du champ dans [0, 1] : 0 au fond des sillons, 1 à la pointe
-        /// d'un tubercule. <paramref name="sharpness"/> commande la brutalité du
-        /// passage — bas, des bosses molles ; haut, des pointes.
+        /// Hauteur du champ dans [0, 1] : 0 au fond des sillons, 1 au sommet
+        /// d'une écaille.
+        ///
+        /// Construite sur F2 - F1, l'écart entre les deux germes les plus
+        /// proches, et NON sur F1 seul. F1 mesure la distance au centre d'une
+        /// cellule : il produit des dômes ronds, isolés sur une surface lisse.
+        /// F2 - F1 s'annule exactement sur les frontières entre cellules : il
+        /// produit des PLAQUES POLYGONALES jointives séparées de sillons fins.
+        /// C'est la différence entre des boutons posés sur une bille et la peau
+        /// d'un letchi, qui pave toute sa surface comme une pomme de pin.
         /// </summary>
         public static float Field(Vector3 position, float sharpness)
         {
@@ -54,6 +61,7 @@ namespace KoutSab.Fruits
             float localZ = position.z - cellZ;
 
             float nearest = 8f;
+            float secondNearest = 8f;
 
             // Voisinage 3x3x3. En 2x2x2 on rate le germe le plus proche quand il
             // est dans une cellule diagonale, et le motif se fend de coutures
@@ -73,13 +81,38 @@ namespace KoutSab.Fruits
                         float distance = Mathf.Sqrt(sx * sx + sy * sy + sz * sz);
                         if (distance < nearest)
                         {
+                            secondNearest = nearest;
                             nearest = distance;
+                        }
+                        else if (distance < secondNearest)
+                        {
+                            secondNearest = distance;
                         }
                     }
                 }
             }
 
-            return Mathf.Pow(Mathf.Clamp01(1f - nearest), sharpness);
+            return Combine(nearest, secondNearest, sharpness);
+        }
+
+        /// <summary>
+        /// Assemble le plateau et sa pointe. Partagé mot pour mot avec le HLSL.
+        /// </summary>
+        public static float Combine(float nearest, float secondNearest, float sharpness)
+        {
+            // Plateau polygonal : 1 à l'intérieur d'une écaille, 0 dans le sillon.
+            // GrooveWidth commande la finesse du sillon — au-delà de 0,2 les
+            // plaques se détachent et redeviennent des boutons isolés.
+            const float GrooveWidth = 0.11f;
+            float plate = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((secondNearest - nearest) / GrooveWidth));
+
+            // Chaque écaille est BOMBÉE, pas un plateau plat. Avec un plateau, le
+            // relief ne varie qu'au droit des sillons — trop fins pour tomber entre
+            // deux sommets à 1280 triangles : la silhouette redevenait lisse et le
+            // motif ressemblait à un dessin posé sur une bille.
+            float mound = Mathf.Pow(Mathf.Clamp01(1f - nearest), sharpness);
+
+            return plate * (0.20f + 0.80f * mound);
         }
     }
 }
