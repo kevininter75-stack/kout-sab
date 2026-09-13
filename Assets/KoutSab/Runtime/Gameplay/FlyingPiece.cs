@@ -1,3 +1,4 @@
+using KoutSab.Fruits;
 using UnityEngine;
 
 namespace KoutSab.Gameplay
@@ -27,6 +28,19 @@ namespace KoutSab.Gameplay
 
         public MeshFilter Filter { get; private set; }
         public MeshRenderer Renderer { get; private set; }
+
+        /// <summary>Variété portée pour ce vol. Les objets sont mis en commun
+        /// entre toutes les variétés : c'est ici qu'on sait ce qu'on vient de
+        /// lancer, et donc la couleur du jus et les points à marquer.</summary>
+        public FruitPrototype Prototype { get; private set; }
+
+        /// <summary>Pose le maillage et les matériaux de la variété tirée.</summary>
+        public void SetVisual(FruitPrototype prototype, Mesh mesh, Material[] materials)
+        {
+            Prototype = prototype;
+            Filter.sharedMesh = mesh;
+            Renderer.sharedMaterials = materials;
+        }
 
         private void Awake()
         {

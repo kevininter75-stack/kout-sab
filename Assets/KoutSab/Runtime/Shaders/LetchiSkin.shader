@@ -38,20 +38,9 @@ Shader "Kout Sab/Peau de letchi"
             #pragma multi_compile_fog
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "SkinInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "LetchiTubercles.hlsl"
-
-            CBUFFER_START(UnityPerMaterial)
-                float4 _BaseColor;
-                float4 _DeepColor;
-                float4 _TipColor;
-                float4 _RimColor;
-                float  _TubercleScale;
-                float  _TubercleDepth;
-                float  _GrooveSharpness;
-                float  _Smoothness;
-                float  _RimPower;
-            CBUFFER_END
 
             struct Attributes
             {
@@ -161,6 +150,7 @@ Shader "Kout Sab/Peau de letchi"
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "SkinInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
             ENDHLSL
@@ -180,6 +170,7 @@ Shader "Kout Sab/Peau de letchi"
             #pragma fragment DepthOnlyFragment
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "SkinInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
             ENDHLSL
         }

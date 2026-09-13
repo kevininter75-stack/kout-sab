@@ -45,19 +45,8 @@ Shader "Kout Sab/Chair de letchi"
             #pragma multi_compile_fog
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "FleshInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-
-            CBUFFER_START(UnityPerMaterial)
-                float4 _FleshColor;
-                float4 _FleshDeep;
-                float4 _SeedColor;
-                float4 _RindColor;
-                float  _FruitRadius;
-                float  _SeedRadius;
-                float  _RindWidth;
-                float  _Translucency;
-                float  _Smoothness;
-            CBUFFER_END
 
             struct Attributes
             {
@@ -166,6 +155,7 @@ Shader "Kout Sab/Chair de letchi"
             #pragma fragment ShadowPassFragment
             #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "FleshInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
             ENDHLSL
@@ -182,6 +172,7 @@ Shader "Kout Sab/Chair de letchi"
             #pragma vertex DepthOnlyVertex
             #pragma fragment DepthOnlyFragment
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "FleshInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
             ENDHLSL
         }

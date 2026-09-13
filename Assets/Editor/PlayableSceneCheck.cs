@@ -31,10 +31,32 @@ namespace KoutSab.EditorTools
             if (arena != null)
             {
                 var serialized = new SerializedObject(arena);
-                Report("  -> matériau de peau", serialized.FindProperty("skinMaterial").objectReferenceValue != null);
-                Report("  -> matériau de chair", serialized.FindProperty("fleshMaterial").objectReferenceValue != null);
+                Report("  -> shader de peau", serialized.FindProperty("skinShader").objectReferenceValue != null);
+                Report("  -> shader de chair", serialized.FindProperty("fleshShader").objectReferenceValue != null);
+                Report("  -> matériau de jus", serialized.FindProperty("juiceMaterial").objectReferenceValue != null);
                 Report("  -> référence à la lame", serialized.FindProperty("blade").objectReferenceValue != null);
             }
+
+            var session = Object.FindFirstObjectByType<GameSession>();
+            Report("Partie (GameSession)", session != null);
+            if (session != null)
+            {
+                var serialized = new SerializedObject(session);
+                Report("  -> référence au terrain", serialized.FindProperty("arena").objectReferenceValue != null);
+            }
+
+            var hud = Object.FindFirstObjectByType<HudView>();
+            Report("HUD (UI Toolkit)", hud != null);
+            if (hud != null)
+            {
+                var document = hud.GetComponent<UnityEngine.UIElements.UIDocument>();
+                Report("  -> UIDocument", document != null);
+                Report("  -> PanelSettings", document != null && document.panelSettings != null);
+                var serialized = new SerializedObject(hud);
+                Report("  -> référence à la partie", serialized.FindProperty("session").objectReferenceValue != null);
+            }
+
+            Debug.Log($"[Kout Sab] Catalogue : {KoutSab.Fruits.FruitCatalogue.Varieties.Length} variétés.");
 
             Report("Lumières directionnelles", Object.FindObjectsByType<Light>(FindObjectsSortMode.None).Length >= 2);
 

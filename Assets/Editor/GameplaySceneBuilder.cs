@@ -23,21 +23,30 @@ namespace KoutSab.EditorTools
         private const string ScenePath = Folder + "/Scenes/Jeu_Letchi.unity";
         private const string SkinMaterialPath = Folder + "/Materials/M_LetchiSkin.mat";
         private const string FleshMaterialPath = Folder + "/Materials/M_LetchiFlesh.mat";
+        private const string JuiceMaterialPath = Folder + "/Materials/M_Jus.mat";
+        private const string PanelSettingsPath = Folder + "/UI/ReglagesPanneau.asset";
         private const string BladeMaterialPath = Folder + "/Materials/M_RubanDeLame.mat";
 
         [MenuItem("Kout Sab/Construire la scene jouable")]
         public static void Build()
         {
-            Material skin = SpikeSceneBuilder.EnsureSkinMaterial();
-            Material flesh = EnsureFleshMaterial();
+            // Les matériaux de peau et de chair sont désormais créés à l'exécution,
+            // un par variété, à partir de ces deux shaders : dix variétés font
+            // dix jeux de couleurs, et les figer en assets n'apporterait rien.
+            Shader skinShader = FindShader("Kout Sab/Peau de letchi");
+            Shader fleshShader = FindShader("Kout Sab/Chair de letchi");
+            Material juice = EnsureJuiceMaterial();
             Material bladeMaterial = EnsureBladeMaterial();
+            EnsureFleshMaterial();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             Camera camera = CreateCamera();
             CreateLighting();
             SwipeBlade blade = CreateBlade(bladeMaterial);
-            CreateArena(skin, flesh, blade);
+            FruitArena arena = CreateArena(skinShader, fleshShader, juice, blade);
+            GameSession session = CreateSession(arena);
+            CreateHud(session);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             AssetDatabase.SaveAssets();
@@ -118,7 +127,8 @@ namespace KoutSab.EditorTools
             return go.AddComponent<SwipeBlade>();
         }
 
-        private static void CreateArena(Material skin, Material flesh, SwipeBlade blade)
+        private static FruitArena CreateArena(Shader skinShader, Shader fleshShader,
+                                              Material juice, SwipeBlade blade)
         {
             var go = new GameObject("Terrain");
             var arena = go.AddComponent<FruitArena>();
@@ -126,10 +136,76 @@ namespace KoutSab.EditorTools
             // Les champs sont privés et sérialisés : on passe par SerializedObject
             // plutôt que de les ouvrir au reste du code juste pour ce montage.
             var serialized = new SerializedObject(arena);
-            serialized.FindProperty("skinMaterial").objectReferenceValue = skin;
-            serialized.FindProperty("fleshMaterial").objectReferenceValue = flesh;
+            serialized.FindProperty("skinShader").objectReferenceValue = skinShader;
+            serialized.FindProperty("fleshShader").objectReferenceValue = fleshShader;
+            serialized.FindProperty("juiceMaterial").objectReferenceValue = juice;
             serialized.FindProperty("blade").objectReferenceValue = blade;
             serialized.ApplyModifiedPropertiesWithoutUndo();
+            return arena;
+        }
+
+        private static GameSession CreateSession(FruitArena arena)
+        {
+            var go = new GameObject("Partie");
+            var session = go.AddComponent<GameSession>();
+
+            var serialized = new SerializedObject(session);
+            serialized.FindProperty("arena").objectReferenceValue = arena;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return session;
+        }
+
+        private static void CreateHud(GameSession session)
+        {
+            var go = new GameObject("HUD");
+            var document = go.AddComponent<UnityEngine.UIElements.UIDocument>();
+            document.panelSettings = EnsurePanelSettings();
+
+            var hud = go.AddComponent<HudView>();
+            var serialized = new SerializedObject(hud);
+            serialized.FindProperty("session").objectReferenceValue = session;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        private static UnityEngine.UIElements.PanelSettings EnsurePanelSettings()
+        {
+            EnsureFolder(Folder + "/UI");
+
+            var settings = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.PanelSettings>(PanelSettingsPath);
+            if (settings == null)
+            {
+                settings = ScriptableObject.CreateInstance<UnityEngine.UIElements.PanelSettings>();
+                AssetDatabase.CreateAsset(settings, PanelSettingsPath);
+            }
+
+            // Mise à l'échelle sur la hauteur de référence : le HUD doit occuper
+            // la même part d'écran sur un téléphone que sur un moniteur, et c'est
+            // la hauteur qui commande en portrait comme en paysage.
+            settings.scaleMode = UnityEngine.UIElements.PanelScaleMode.ScaleWithScreenSize;
+            settings.referenceResolution = new Vector2Int(1080, 1920);
+            settings.match = 1f;
+            EditorUtility.SetDirty(settings);
+            return settings;
+        }
+
+        private static Shader FindShader(string name)
+        {
+            Shader shader = Shader.Find(name);
+            if (shader == null)
+            {
+                Debug.LogError($"[Kout Sab] Shader introuvable : {name}");
+            }
+            else if (ShaderUtil.ShaderHasError(shader))
+            {
+                Debug.LogError($"[Kout Sab] Le shader {name} contient des erreurs.");
+            }
+
+            return shader;
+        }
+
+        internal static Material EnsureJuiceMaterial()
+        {
+            return LoadOrCreate(JuiceMaterialPath, "Kout Sab/Goutte de jus");
         }
 
         internal static Material EnsureFleshMaterial()
