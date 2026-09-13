@@ -1,0 +1,63 @@
+# ---------------------------------------------------------------
+# Unity — dossiers entièrement régénérés par l'éditeur.
+# Library/ pèse plusieurs Go et se reconstruit à la première
+# ouverture : le versionner ferait exploser le dépôt pour rien.
+# ---------------------------------------------------------------
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]serSettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Artefacts d'import d'assets
+/[Aa]ssets/AssetStoreTools*
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# Adressables (généré)
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ---------------------------------------------------------------
+# Projets et solutions d'IDE — régénérés par Unity à chaque
+# changement de script. Les versionner crée des conflits permanents.
+# ---------------------------------------------------------------
+.vs/
+.vscode/
+.idea/
+.vsconfig
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.tmp
+
+# ---------------------------------------------------------------
+# Sorties de build
+# ---------------------------------------------------------------
+*.apk
+*.aab
+*.app
+*.unitypackage
+*.unitypackage.meta
+
+# ---------------------------------------------------------------
+# Rapports de plantage et fichiers système
+# ---------------------------------------------------------------
+sysinfo.txt
+crashlytics-build.properties
+.DS_Store
+Thumbs.db
