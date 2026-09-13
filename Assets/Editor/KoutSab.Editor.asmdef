@@ -1,0 +1,10 @@
+{
+    "name": "KoutSab.Editor",
+    "rootNamespace": "KoutSab.EditorTools",
+    "references": [
+        "KoutSab.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [ "Editor" ],
+    "autoReferenced": true
+}

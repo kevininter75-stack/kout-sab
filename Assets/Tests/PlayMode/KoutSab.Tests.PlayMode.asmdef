@@ -1,0 +1,14 @@
+{
+    "name": "KoutSab.Tests.PlayMode",
+    "rootNamespace": "KoutSab.Tests",
+    "references": [
+        "KoutSab.Runtime",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Unity.InputSystem"
+    ],
+    "precompiledReferences": [ "nunit.framework.dll" ],
+    "defineConstraints": [ "UNITY_INCLUDE_TESTS" ],
+    "overrideReferences": true,
+    "autoReferenced": false
+}

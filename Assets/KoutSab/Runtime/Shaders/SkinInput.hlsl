@@ -22,9 +22,14 @@
 // Enregistrer les materiaux comme assets n'y change rien. Sortir les uniformes
 // du CBUFFER casse le rendu entierement.
 //
-// Ce que ca veut dire : la planche de catalogue hors jeu ne peut pas montrer
-// les couleurs par variete. EN MODE JEU, ou le batcher est actif, le rendu
-// devrait etre correct — mais ce n'est pas verifie.
+// RESOLU LE 2026-09-13 : le defaut n'existe QUE hors jeu. Un test en mode jeu
+// (PartieTests.Deux_fruits_differents_sortent_de_couleurs_differentes_a_l_ecran)
+// pose un letchi et un corossol devant la camera, rend l'image et lit les
+// pixels : letchi (1.00, 0.55, 0.53) rose, corossol (0.77, 0.85, 0.39) vert,
+// ecart 0,671. Les couleurs par variete sont donc correctes dans le jeu.
+//
+// Seule la planche de catalogue hors jeu reste fausse. Ne pas s'y fier, et NE
+// PAS toucher a ce CBUFFER : le sortir casse le rendu entierement.
 
 CBUFFER_START(UnityPerMaterial)
     float4 _BaseColor;

@@ -1,0 +1,9 @@
+{
+    "name": "KoutSab.Runtime",
+    "rootNamespace": "KoutSab",
+    "references": [
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "autoReferenced": true
+}
