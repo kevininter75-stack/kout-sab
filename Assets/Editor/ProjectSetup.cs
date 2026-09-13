@@ -21,7 +21,7 @@ namespace KoutSab.EditorTools
         private const string CompanyName = "Kevininter";
         private const string ProductName = "Kout Sab'";
 
-        [MenuItem("Kout Sab'/Configurer le projet")]
+        [MenuItem("Kout Sab/Configurer le projet")]
         public static void Configure()
         {
             ConfigureIdentity();
@@ -90,7 +90,7 @@ namespace KoutSab.EditorTools
             PlayerSettings.Android.startInFullscreen = true;
         }
 
-        [MenuItem("Kout Sab'/Basculer sur Android")]
+        [MenuItem("Kout Sab/Basculer sur Android")]
         public static void SwitchToAndroid()
         {
             if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android)

@@ -61,3 +61,6 @@ sysinfo.txt
 crashlytics-build.properties
 .DS_Store
 Thumbs.db
+
+# Captures de rendu : régénérées par Kout Sab -> Spike - capturer le letchi
+/Captures/

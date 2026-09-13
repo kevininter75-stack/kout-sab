@@ -14,7 +14,7 @@ namespace KoutSab.EditorTools
     {
         private const int TriangleBudget = 800;
 
-        [MenuItem("Kout Sab'/Vérifier le budget des maillages")]
+        [MenuItem("Kout Sab/Vérifier le budget des maillages")]
         public static void Validate()
         {
             var shape = LetchiShape.Default;
