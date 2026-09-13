@@ -7,11 +7,11 @@ Shader "Kout Sab/Peau de letchi"
 {
     Properties
     {
-        _BaseColor       ("Rouge des tubercules",   Color) = (0.85, 0.18, 0.24, 1)
-        _DeepColor       ("Rouge des sillons",      Color) = (0.34, 0.05, 0.09, 1)
-        _TipColor        ("Pointe des tubercules",  Color) = (0.96, 0.45, 0.34, 1)
+        _BaseColor       ("Rouge des tubercules",   Color) = (0.66, 0.25, 0.15, 1)
+        _DeepColor       ("Rouge des sillons",      Color) = (0.36, 0.12, 0.07, 1)
+        _TipColor        ("Pointe des tubercules",  Color) = (0.90, 0.52, 0.38, 1)
         _TubercleScale   ("Densité des tubercules", Range(50, 1500)) = 520
-        _TubercleDepth   ("Relief apparent",        Range(0, 3)) = 1.1
+        _TubercleDepth   ("Relief fin (par-dessus la géométrie)", Range(0, 3)) = 1.6
         _GrooveSharpness ("Netteté des sillons",    Range(1, 12)) = 4
         _Smoothness      ("Brillance",              Range(0, 1)) = 0.28
         _RimColor        ("Liseré de contre-jour",  Color) = (1.0, 0.62, 0.35, 1)
@@ -57,13 +57,14 @@ Shader "Kout Sab/Peau de letchi"
             {
                 float4 positionOS : POSITION;
                 float3 normalOS   : NORMAL;
+                float3 smoothOS   : TEXCOORD1;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float3 positionOS : TEXCOORD0;
+                float3 smoothOS   : TEXCOORD0;
                 float3 positionWS : TEXCOORD1;
                 float3 normalWS   : TEXCOORD2;
                 float  fogFactor  : TEXCOORD3;
@@ -81,10 +82,12 @@ Shader "Kout Sab/Peau de letchi"
 
                 output.positionCS = positions.positionCS;
                 output.positionWS = positions.positionWS;
-                // La position objet est transmise telle quelle : c'est l'espace dans
-                // lequel le motif de peau est défini, donc il tourne AVEC le fruit
+                // UV1 porte la position du sommet AVANT déplacement. C'est là que
+                // le maillage a échantillonné le champ ; échantillonner ailleurs
+                // décalerait l'ombrage d'un demi-tubercule par rapport au relief.
+                // Et comme c'est une position objet, le motif tourne AVEC le fruit
                 // au lieu de glisser dessus pendant qu'il vole.
-                output.positionOS = input.positionOS.xyz;
+                output.smoothOS = input.smoothOS;
                 output.normalWS   = normals.normalWS;
                 output.fogFactor  = ComputeFogFactor(positions.positionCS.z);
                 return output;
@@ -95,7 +98,7 @@ Shader "Kout Sab/Peau de letchi"
                 UNITY_SETUP_INSTANCE_ID(input);
 
                 float3 gradientOS;
-                float height = LetchiTubercleField(input.positionOS * _TubercleScale,
+                float height = LetchiTubercleField(input.smoothOS * _TubercleScale,
                                                    _GrooveSharpness, gradientOS);
 
                 // Bosselage : on incline la normale selon la pente du champ. La
@@ -103,11 +106,13 @@ Shader "Kout Sab/Peau de letchi"
                 float3 gradientWS = TransformObjectToWorldDir(gradientOS, false);
                 float3 normalWS = normalize(input.normalWS - gradientWS * _TubercleDepth * 0.06);
 
-                // Deux mélanges successifs plutôt qu'un dégradé linéaire : un letchi
-                // a des creux nets et des sommets qui accrochent la lumière, pas une
-                // transition douce entre deux rouges.
-                half3 albedo = lerp(_DeepColor.rgb, _BaseColor.rgb, saturate(height * 1.35));
-                albedo = lerp(albedo, _TipColor.rgb, saturate((height - 0.72) * 3.2));
+                // Sur un vrai letchi, une écaille n'est pas plus CLAIRE que le reste
+                // de la peau : elle est du même rouge, et c'est la lumière qui la
+                // révèle. Peindre les pointes en clair donnait des points lumineux,
+                // comme si le fruit était criblé de perles. On garde donc des sillons
+                // franchement sombres et une pointe à peine éclaircie.
+                half3 albedo = lerp(_DeepColor.rgb, _BaseColor.rgb, smoothstep(0.02, 0.42, height));
+                albedo = lerp(albedo, _TipColor.rgb, saturate((height - 0.86) * 2.4) * 0.16);
 
                 InputData inputData = (InputData)0;
                 inputData.positionWS = input.positionWS;

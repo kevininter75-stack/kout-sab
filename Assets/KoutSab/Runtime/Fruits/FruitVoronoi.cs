@@ -1,0 +1,85 @@
+using UnityEngine;
+
+namespace KoutSab.Fruits
+{
+    /// <summary>
+    /// Champ de Voronoï 3D — le motif de tubercules des fruits à peau granuleuse.
+    ///
+    /// IMPORTANT : ce code est le jumeau exact de LetchiTubercles.hlsl. Le
+    /// maillage déplace ses sommets avec la version C#, le shader ombre la
+    /// surface avec la version HLSL : si les deux divergeaient d'un pouce, les
+    /// bosses de lumière ne tomberaient pas sur les bosses de géométrie et le
+    /// fruit paraîtrait sale sans qu'on sache pourquoi.
+    ///
+    /// C'est pour ça que le hachage est fait en entiers et non avec la ruse
+    /// habituelle frac(sin(x) * 43758.5453). Le sinus de grands nombres diverge
+    /// entre un processeur et un GPU ; les opérations sur entiers, non.
+    /// Toute modification ici doit être reportée à l'identique dans le .hlsl.
+    /// </summary>
+    public static class FruitVoronoi
+    {
+        private static uint Hash(int x, int y, int z, uint channel)
+        {
+            unchecked
+            {
+                uint h = 0x9E3779B1u ^ (channel * 0x85EBCA77u);
+                h ^= (uint)x * 0xC2B2AE3Du;
+                h = (h ^ (h >> 15)) * 0x27D4EB2Fu;
+                h ^= (uint)y * 0x165667B1u;
+                h = (h ^ (h >> 13)) * 0x2545F491u;
+                h ^= (uint)z * 0x9E3779B1u;
+                h = (h ^ (h >> 16)) * 0x85EBCA77u;
+                return h ^ (h >> 15);
+            }
+        }
+
+        private static float Unit(uint hash)
+        {
+            return (hash & 0xFFFFFFu) / 16777215f;
+        }
+
+        /// <summary>
+        /// Hauteur du champ dans [0, 1] : 0 au fond des sillons, 1 à la pointe
+        /// d'un tubercule. <paramref name="sharpness"/> commande la brutalité du
+        /// passage — bas, des bosses molles ; haut, des pointes.
+        /// </summary>
+        public static float Field(Vector3 position, float sharpness)
+        {
+            int cellX = Mathf.FloorToInt(position.x);
+            int cellY = Mathf.FloorToInt(position.y);
+            int cellZ = Mathf.FloorToInt(position.z);
+
+            float localX = position.x - cellX;
+            float localY = position.y - cellY;
+            float localZ = position.z - cellZ;
+
+            float nearest = 8f;
+
+            // Voisinage 3x3x3. En 2x2x2 on rate le germe le plus proche quand il
+            // est dans une cellule diagonale, et le motif se fend de coutures
+            // droites parfaitement visibles sur une sphère.
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    for (int dz = -1; dz <= 1; dz++)
+                    {
+                        int nx = cellX + dx, ny = cellY + dy, nz = cellZ + dz;
+
+                        float sx = dx + Unit(Hash(nx, ny, nz, 0u)) - localX;
+                        float sy = dy + Unit(Hash(nx, ny, nz, 1u)) - localY;
+                        float sz = dz + Unit(Hash(nx, ny, nz, 2u)) - localZ;
+
+                        float distance = Mathf.Sqrt(sx * sx + sy * sy + sz * sz);
+                        if (distance < nearest)
+                        {
+                            nearest = distance;
+                        }
+                    }
+                }
+            }
+
+            return Mathf.Pow(Mathf.Clamp01(1f - nearest), sharpness);
+        }
+    }
+}

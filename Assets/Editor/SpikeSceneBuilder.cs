@@ -81,10 +81,24 @@ namespace KoutSab.EditorTools
             // fait que 3,6 cm : à 78, il ne traversait que trois cellules et la
             // peau se couvrait de quelques bosses énormes. À 520, il en traverse
             // une vingtaine — l'ordre de grandeur d'un vrai letchi.
-            material.SetFloat("_TubercleScale", 520f);
-            material.SetFloat("_GrooveSharpness", 4f);
-            material.SetFloat("_TubercleDepth", 1.4f);
-            material.SetFloat("_Smoothness", 0.28f);
+            // Échelle et netteté lues sur LetchiShape : c'est le maillage qui
+            // fait foi. Deux valeurs divergentes et la lumière ne tomberait plus
+            // sur les bosses de géométrie.
+            LetchiShape shape = LetchiShape.Default;
+            material.SetFloat("_TubercleScale", shape.tubercleScale);
+            material.SetFloat("_GrooveSharpness", shape.tubercleSharpness);
+            material.SetFloat("_TubercleDepth", 1.6f);
+            material.SetFloat("_Smoothness", 0.34f);
+
+            // Couleurs relevées sur 196 905 pixels de peau, tirés de six photos
+            // de Litchi chinensis. La teinte réelle est à 10-16°, un rouge brique
+            // orangé — pas le rouge rosé à 354° qu'on imagine de mémoire.
+            // Valeurs remontées par rapport à la mesure brute : le moteur applique
+            // son propre éclairage par-dessus, reprendre les pixels ombrés d'une
+            // photo assombrirait deux fois.
+            material.SetColor("_DeepColor", new Color(0.36f, 0.12f, 0.07f));
+            material.SetColor("_BaseColor", new Color(0.62f, 0.25f, 0.16f));
+            material.SetColor("_TipColor", new Color(0.90f, 0.52f, 0.38f));
             EditorUtility.SetDirty(material);
 
             return material;
@@ -101,7 +115,7 @@ namespace KoutSab.EditorTools
             // qui révèle la texture de la peau.
             sunObject.transform.rotation = Quaternion.Euler(14f, 35f, 0f);
             sun.color = new Color(1.0f, 0.76f, 0.52f);
-            sun.intensity = 3.1f;
+            sun.intensity = 3.5f;
             sun.shadows = LightShadows.Soft;
 
             // Lumière de remplissage froide côté opposé : sans elle, la moitié
@@ -111,14 +125,14 @@ namespace KoutSab.EditorTools
             fill.type = LightType.Directional;
             fillObject.transform.rotation = Quaternion.Euler(28f, -140f, 0f);
             fill.color = new Color(0.42f, 0.58f, 0.82f);
-            fill.intensity = 0.55f;
+            fill.intensity = 1.05f;
             fill.shadows = LightShadows.None;
 
             // Ambiance : dégradé ciel chaud vers sol ocre, plutôt qu'un gris neutre.
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.55f, 0.45f, 0.42f);
-            RenderSettings.ambientEquatorColor = new Color(0.38f, 0.26f, 0.24f);
-            RenderSettings.ambientGroundColor = new Color(0.20f, 0.13f, 0.10f);
+            RenderSettings.ambientSkyColor = new Color(0.78f, 0.66f, 0.60f);
+            RenderSettings.ambientEquatorColor = new Color(0.55f, 0.40f, 0.36f);
+            RenderSettings.ambientGroundColor = new Color(0.30f, 0.20f, 0.16f);
         }
 
         private static void CreateCamera()
@@ -137,7 +151,7 @@ namespace KoutSab.EditorTools
 
             // Fond bleu-violet profond : la couleur du ciel à l'opposé du couchant.
             // Il fait ressortir le liseré chaud du contre-jour.
-            camera.backgroundColor = new Color(0.12f, 0.10f, 0.16f);
+            camera.backgroundColor = new Color(0.20f, 0.16f, 0.22f);
             cameraObject.tag = "MainCamera";
         }
 
