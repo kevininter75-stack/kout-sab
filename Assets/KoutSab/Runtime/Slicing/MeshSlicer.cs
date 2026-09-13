@@ -69,11 +69,17 @@ namespace KoutSab.Slicing
             Vector3 axisV = Vector3.Cross(planeNormal, axisU);
             SortCutPointsByAngle(centre, axisU, axisV);
 
-            AppendCap(centre, -planeNormal, axisU, axisV, false);
+            // Sens d'enroulement : les points de section sont triés dans le sens
+            // trigonométrique vu depuis +normale. La face de coupe de la moitié
+            // HAUTE se regarde depuis -normale — elle apparaît donc en sens
+            // horaire et doit être inversée, sinon elle est éliminée comme face
+            // arrière et la chair reste invisible. Pour la moitié basse, c'est
+            // l'inverse.
+            AppendCap(centre, -planeNormal, axisU, axisV, true);
             Upload(upper);
 
             BuildSide(source, planePoint, planeNormal, false);
-            AppendCap(centre, planeNormal, axisU, axisV, true);
+            AppendCap(centre, planeNormal, axisU, axisV, false);
             Upload(lower);
 
             return true;

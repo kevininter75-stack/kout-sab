@@ -25,7 +25,7 @@ namespace KoutSab.EditorTools
         [MenuItem("Kout Sab/Spike - construire la scene du letchi")]
         public static void BuildLetchiSpikeScene()
         {
-            Material material = CreateSkinMaterial();
+            Material material = EnsureSkinMaterial();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
@@ -40,7 +40,12 @@ namespace KoutSab.EditorTools
             Debug.Log($"[Kout Sab] Scène de spike écrite : {ScenePath}");
         }
 
-        private static Material CreateSkinMaterial()
+        /// <summary>
+        /// Partagé avec la scène jouable : le matériau de peau est le même objet
+        /// dans les deux scènes, sinon un réglage corrigé dans l'une ne suivrait
+        /// jamais dans l'autre.
+        /// </summary>
+        internal static Material EnsureSkinMaterial()
         {
             Shader shader = Shader.Find(ShaderName);
             if (shader == null)
